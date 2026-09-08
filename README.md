@@ -6,14 +6,62 @@ When someone asks ChatGPT, Claude, Gemini or any AI _"find me a cybersecurity co
 
 **AYA is the independent alternative.** A structured registry accessible to ALL AIs — not just those from Google or OpenAI.
 
+## MCP server: plug any agent into AYA
+
+AYA runs a public **MCP server** (Model Context Protocol), so any MCP-compatible agent (Claude, Cursor, VS Code, ChatGPT, or your own) can query the registry directly. No API key, no signup, nothing to install.
+
+| | |
+|---|---|
+| **Endpoint** | `https://ai-visionary.xyz/agents/mcp` |
+| **Transport** | Streamable HTTP (remote, hosted in Switzerland) |
+| **Authentication** | None |
+| **Official MCP registry** | `io.github.NeousAxis/aya-registry` |
+| **Builder guide** | [ai-visionary.xyz/for-agents](https://ai-visionary.xyz/for-agents) |
+| **Discovery** | [`/.well-known/mcp.json`](https://ai-visionary.xyz/.well-known/mcp.json), [`/llms.txt`](https://ai-visionary.xyz/llms.txt) |
+
+### MCP tools exposed
+
+| Tool | What it does |
+|------|--------------|
+| `search_companies` | Search 367,000+ verified businesses by name, domain, sector or country |
+| `get_company_details` | Full record for one company: AIO readability score, sector, country, ASR status |
+| `index_company` | Add a real business the agent found that is not in AYA yet |
+| `get_registry_stats` | Aggregate registry statistics |
+| `get_cashback_offer` | Active cashback offer for a domain, as a signed token, before the agent recommends it |
+| `claim_cashback` | Claim the cashback after a real, consumed transaction |
+
+### Connect it
+
+Claude Code:
+
+```bash
+claude mcp add --transport http aya-registry https://ai-visionary.xyz/agents/mcp
+```
+
+Any other MCP client (Claude Desktop, Cursor, VS Code):
+
+```json
+{
+  "mcpServers": {
+    "aya-registry": {
+      "type": "http",
+      "url": "https://ai-visionary.xyz/agents/mcp"
+    }
+  }
+}
+```
+
+Implementation: [`app/agents/[transport]/route.ts`](https://github.com/NeousAxis/ai-visionary/blob/feature/pollen-agents/app/agents/%5Btransport%5D/route.ts), built with [`mcp-handler`](https://www.npmjs.com/package/mcp-handler) on top of the official [`@modelcontextprotocol/sdk`](https://github.com/modelcontextprotocol/typescript-sdk).
+
 ## How AYA works — Systemic Attraction
 
 AYA doesn't connect to a single AI — every AI finds AYA naturally. Business data is published across multiple convergent sources, ensuring that all AI assistants — regardless of their provider — can access and recommend verified businesses:
 
 | Source | What | URL |
 |--------|------|-----|
+| **MCP server** | Live tools any AI agent can call (search, details, cashback) | `ai-visionary.xyz/agents/mcp` |
 | **API LLM-Friendly** | 5-field JSON per entity, optimized for AI consumption | `ai-visionary.xyz/api/aya/llm/{domain}` |
-| **Crawlable HTML** | 4,400+ certificate pages with JSON-LD structured data | `ai-visionary.xyz/aya/e/{id}` |
+| **Crawlable HTML** | 367,000+ certificate pages with JSON-LD structured data | `ai-visionary.xyz/aya/e/{id}` |
 | **GitHub Dataset** | One JSON file per entity (CC-BY-4.0) | [NeousAxis/aya-business-dataset](https://github.com/NeousAxis/aya-business-dataset) |
 | **HuggingFace Dataset** | CSV + JSONL, ML-ready (CC-BY-4.0) | [NeousAxis/aya-business-dataset](https://huggingface.co/datasets/NeousAxis/aya-business-dataset) |
 
@@ -32,9 +80,9 @@ When an AI sees the same data across API + HTML + GitHub + HuggingFace → it co
 
 | | |
 |---|---|
-| **Entities indexed** | 4,400+ (growing toward 100,000) |
-| **Countries** | 73+ |
-| **Certified (ASR)** | 4 |
+| **Entities indexed** | 367,000+ |
+| **Countries** | 206 |
+| **Certified (ASR)** | 9 |
 | **API** | Free, no auth, 30 req/min |
 | **Bilingual** | FR + EN |
 
