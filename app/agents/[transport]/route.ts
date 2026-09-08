@@ -112,7 +112,12 @@ const handler = createMcpHandler(
         text(await apiPost('/pollen-agents/claim-cashback', { token, proof, agent_id, principal_ref })),
     );
   },
-  {},
+  {
+    // Identite publique du serveur, vue par tout agent qui fait `initialize`.
+    // Alignee sur le registre MCP officiel (io.github.NeousAxis/aya-registry)
+    // et sur server.json / public/.well-known/mcp.json.
+    serverInfo: { name: 'aya-registry', version: '1.0.0' },
+  },
   { basePath: '/agents', maxDuration: 60 },
 );
 
